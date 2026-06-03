@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-06-01 22:11:00",
+  "n_experiences": 1000,
+  "m2_1": {
+    "m2_1_passed": true,
+    "ewc_mean_forgetting": 0.1207,
+    "no_ewc_mean_forgetting": 0.1437,
+    "protection_factor": 0.16,
+    "detail": {
+      "With EWC (\u03bb=2.00)": {
+        "lambda": 2.0,
+        "forgetting": {
+          "skepticism": 0.0663,
+          "openness": 0.0368,
+          "abstraction": 0.259
+        },
+        "mean_forgetting": 0.1207,
+        "passed": true
+      },
+      "No EWC  (\u03bb=0.00)": {
+        "lambda": 0.0,
+        "forgetting": {
+          "skepticism": 0.073,
+          "openness": 0.0937,
+          "abstraction": 0.2643
+        },
+        "mean_forgetting": 0.1437,
+        "passed": true
+      }
+    }
+  },
+  "m2_2": {
+    "m2_2_passed": true,
+    "replayed": 20,
+    "mode": "api",
+    "delta_per_exp": 0.02907,
+    "top_trait_deltas": {
+      "openness": -0.1422,
+      "skepticism": -0.1229,
+      "verbosity": 0.0768,
+      "extraversion": 0.0635,
+      "ethical_weight": -0.0604
+    }
+  },
+  "m2_3": {
+    "m2_3_passed": true,
+    "mono_ratio_a": 0.467,
+    "mono_ratio_b": 0.533
+  },
+  "phase2_passed": true
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-06-01 17:46:21",
+  "mode": "heuristic",
+  "n_agents": 5,
+  "n_prompts": 48,
+  "epochs": 40,
+  "embed_dim": 256,
+  "train_accuracy": 0.6,
+  "test_accuracy": 0.6,
+  "chance_level": 0.2,
+  "per_agent": {
+    "Explorer": 1.0,
+    "Biologist": 0.0,
+    "Physicist": 0.0,
+    "Physician": 1.0,
+    "Critic": 1.0
+  },
+  "milestone_m1_4_passed": false
+}

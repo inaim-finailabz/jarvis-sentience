@@ -1,0 +1,97 @@
+{
+  "pearson_r": 0.3602,
+  "n_pairs": 15,
+  "passed": false,
+  "pairs": [
+    {
+      "a": "Explorer",
+      "b": "Critic",
+      "trait_d": 1.1493,
+      "response_d": 0.5588
+    },
+    {
+      "a": "Explorer",
+      "b": "Scientist",
+      "trait_d": 1.132,
+      "response_d": 0.5182
+    },
+    {
+      "a": "Explorer",
+      "b": "Pragmatist",
+      "trait_d": 1.1856,
+      "response_d": 0.6331
+    },
+    {
+      "a": "Explorer",
+      "b": "Mystic",
+      "trait_d": 1.1571,
+      "response_d": 0.5051
+    },
+    {
+      "a": "Explorer",
+      "b": "Guardian",
+      "trait_d": 1.4852,
+      "response_d": 0.6631
+    },
+    {
+      "a": "Critic",
+      "b": "Scientist",
+      "trait_d": 0.8712,
+      "response_d": 0.5293
+    },
+    {
+      "a": "Critic",
+      "b": "Pragmatist",
+      "trait_d": 0.7074,
+      "response_d": 0.5265
+    },
+    {
+      "a": "Critic",
+      "b": "Mystic",
+      "trait_d": 1.0689,
+      "response_d": 0.6107
+    },
+    {
+      "a": "Critic",
+      "b": "Guardian",
+      "trait_d": 1.0352,
+      "response_d": 0.5531
+    },
+    {
+      "a": "Scientist",
+      "b": "Pragmatist",
+      "trait_d": 0.9403,
+      "response_d": 0.5637
+    },
+    {
+      "a": "Scientist",
+      "b": "Mystic",
+      "trait_d": 1.2201,
+      "response_d": 0.597
+    },
+    {
+      "a": "Scientist",
+      "b": "Guardian",
+      "trait_d": 1.2438,
+      "response_d": 0.6492
+    },
+    {
+      "a": "Pragmatist",
+      "b": "Mystic",
+      "trait_d": 0.9499,
+      "response_d": 0.6666
+    },
+    {
+      "a": "Pragmatist",
+      "b": "Guardian",
+      "trait_d": 0.8224,
+      "response_d": 0.6548
+    },
+    {
+      "a": "Mystic",
+      "b": "Guardian",
+      "trait_d": 1.2814,
+      "response_d": 0.65
+    }
+  ]
+}
