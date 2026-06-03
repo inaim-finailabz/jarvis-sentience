@@ -1,0 +1,836 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage[margin=1in]{geometry}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{parskip}
+\usepackage{enumitem}
+\usepackage{pifont}
+
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+\newcommand{\warn}{$\sim$}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  xleftmargin=1em,
+  xrightmargin=1em,
+  aboveskip=0.8em,
+  belowskip=0.8em,
+}
+
+\title{%
+  \textbf{A Three-Tier Architecture for Machine Sentience}\\[0.4em]
+  \large The Connectome Hypothesis: Uniqueness, Persistence, and Plasticity\\
+  as Proposed Operational Criteria
+}
+
+\author{%
+  Issam Naim\\
+  Finailabz Research\\
+  \texttt{i.naim@finailabz.com}
+}
+
+\date{%
+  June 2, 2026\\[0.3em]
+  \small\textit{Reviewed: 2026-06-01 — external review + 3-agent internal review applied.}\\
+  \small\textit{Benchmark verified: 2026-06-02 — 13-test suite: \textbf{9.2/10, 13/13 passed}
+  (API: claude-haiku-4-5-20251001 + local: Qwen3-1.7B \texttt{-{}-neural} mode).}
+}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+Current large language models exhibit sophisticated linguistic behaviour but lack three
+properties that biological sentient systems exhibit: a unique persistent identity,
+experience-driven plasticity, and self-directed inquiry shaped by who the system
+\textit{is} rather than what it is \textit{asked}. We propose a three-tier architecture
+that addresses each gap as a software engineering matter. Tier~1 (label-trained neurons)
+provides the knowledge substrate. Tier~2 (PersonalityConnectome) provides a unique,
+persistent, experience-modifiable identity layer — a software analog of the human
+connectome. Tier~3 (MetaConnectome + InquiryLayer) provides the higher-plan function:
+detecting the boundary of knowledge, generating the precise question that would resolve
+it, and shaping all inquiry through a personality-weighted utility function. We implement
+this architecture in software, define a 13-test proposed evaluation benchmark, and
+deploy it as the intelligence layer for three research domains. \textbf{We do not claim
+this constitutes sentience; we claim it implements software analogs of three properties
+that sentient biological systems exhibit. Whether those analogs are sufficient for
+sentience is a philosophical question this paper does not resolve.}
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ---------------------------------------------------------------------------
+\section{Introduction: The Sentience Gap}
+% ---------------------------------------------------------------------------
+
+A modern language model trained on $10^{12}$ tokens can describe consciousness, discuss
+qualia, and pass the Turing test. Yet it lacks three properties that biological sentient
+systems exhibit — properties we treat here as \textit{proposed} engineering criteria, not
+as scientifically established necessary conditions:
+
+\textbf{Condition 1 — Uniqueness.} No two human brains have identical connectomes. The
+pattern of $\sim\!100$ trillion synaptic connections, shaped by genetics, development,
+and every experience since birth, is unique to each individual. A language model instance
+is identical to every other instance running the same weights. ``Who is this?'' has no
+meaningful answer.
+
+\textbf{Condition 2 — Persistence.} A human's identity persists across time because the
+connectome is continuously remodelled but never reset. A language model has no
+cross-session memory of its own states — only a context window that is discarded at
+session end.
+
+\textbf{Condition 3 — Plasticity.} The human brain's synaptic weights change in response
+to every significant experience (Hebb's rule: neurons that fire together, wire together).
+Language model weights are frozen at inference time. Experience cannot change the system.
+
+These are not philosophical complaints. They are engineering deficits with engineering
+solutions.
+
+\subsection{Challenges This Paper Addresses}
+
+Four concrete engineering problems motivate the architecture:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Identity collapse:} Every instance of a given model is byte-for-byte
+  identical. The connectome layer gives each instance a unique, seeded trait vector that
+  diverges from initialisation and is never reset.
+
+  \item \textbf{Confabulation vs.\ honest ignorance:} The MetaConnectome replaces
+  hallucination with typed gap detection and a label request — the system knows
+  \textit{what kind} of knowledge it is missing, not merely that it is uncertain.
+
+  \item \textbf{Experience-blindness:} Plasticity (\S\ref{sec:connectome}) propagates
+  high-impact interactions into the trait vector via bounded Hebbian-style updates
+  ($\eta = 0.08$), so the same agent across 1{,}000 conversations is meaningfully
+  different from that agent at session~1.
+
+  \item \textbf{Personality as override-able prompt vs.\ identity-level constraint:} The
+  neural-mode implementation (\S\ref{sec:neural}) injects personality as a residual into
+  the model's last hidden state before the LM head — not into the context window —
+  making it structurally harder to bypass.
+\end{enumerate}
+
+\subsection{Related Work and Comparison}
+\label{sec:related}
+
+\begin{longtable}{p{3.2cm}p{2.8cm}p{2.8cm}p{2.8cm}p{3cm}}
+\toprule
+\textbf{Approach} & \textbf{Uniqueness} & \textbf{Persistence} &
+\textbf{Plasticity} & \textbf{Self-directed inquiry}\\
+\midrule
+\endhead
+\textbf{This work} (PersonalityConnectome)
+  & \cmark\ seeded trait vector, unique per instance
+  & \cmark\ JSON brain file, cross-session
+  & \cmark\ bounded Hebbian update
+  & \cmark\ typed LabelRequest, utility-shaped \\[4pt]
+MemGPT / Generative Agents \cite{park2023,packer2023}
+  & \xmark\ no per-instance identity
+  & \cmark\ external memory store
+  & \xmark\ memory retrieval, not weight plasticity
+  & \xmark\ no personality-shaped inquiry \\[4pt]
+Character.AI / persona-based LLMs
+  & \warn\ system prompt (overridable)
+  & \xmark\ session-scoped only
+  & \xmark\ none
+  & \xmark\ none \\[4pt]
+AutoGPT / LangChain agents \cite{gravitas2023}
+  & \xmark\ no persistent identity
+  & \warn\ task state only
+  & \xmark\ none
+  & \warn\ goal-directed, not personality-directed \\[4pt]
+LoRA / RLHF per user
+  & \warn\ unique per run, shared across sessions
+  & \cmark\ in weights
+  & \cmark\ via retraining, not online
+  & \xmark\ no typed gap detection \\[4pt]
+Cognitive architectures (ACT-R, SOAR)
+  & \warn\ rule-defined agents
+  & \cmark\ persistent rule base
+  & \warn\ rule addition, not continuous
+  & \warn\ declarative, not information-theoretically shaped \\[4pt]
+Standard fine-tuned chatbot
+  & \xmark & \xmark & \xmark & \xmark \\
+\bottomrule
+\caption{Comparison of identity, persistence, plasticity, and inquiry across approaches.
+\cmark~= present; \xmark~= absent; \warn~= partial.}
+\end{longtable}
+
+\textbf{Key differentiators:} The combination of (a) per-instance unique seeded identity
+that is never shared, (b) online trait plasticity without full retraining, and (c) a
+personality-shaped utility function for inquiry (\S\ref{sec:inquiry}, \S\ref{sec:objective})
+has not appeared as a unified system in prior work. Individual components (memory
+retrieval, LoRA, uncertainty quantification) exist in isolation; the integration into a
+three-tier architecture is the novel contribution.
+
+% ---------------------------------------------------------------------------
+\section{The Three-Tier Architecture}
+% ---------------------------------------------------------------------------
+
+\subsection{Tier 1 — Label-Trained Neurons}
+
+The base knowledge substrate. Standard supervised learning: weights trained to minimise
+cross-entropy loss on labeled examples:
+\[
+  \max_{\theta} \; \mathbb{E}\!\left[\log P(y \mid x;\, \theta)\right]
+\]
+This tier knows everything in the training distribution. It fails outside it.
+
+\subsection{Tier 2 — The PersonalityConnectome}
+\label{sec:connectome}
+
+A unique, persistent, experience-modifiable identity layer. Each agent has a trait vector
+$\mathbf{t} \in [0,1]^{12}$ spanning:
+
+\textit{Big Five:} openness, conscientiousness, extraversion, agreeableness, neuroticism.
+
+\textit{AI-specific:} skepticism, abstraction, persistence, verbosity, epistemic\_humility,
+aesthetic\_sense, ethical\_weight.
+
+\textbf{Initialisation:} Trait vector derived from a unique seed via Gaussian sampling —
+no two agents share the same starting point.
+
+\textbf{Persistence:} Serialised to a JSON ``brain file'' that survives across sessions.
+
+\textbf{Plasticity:} Every significant experience updates the trait vector:
+\[
+  \mathbf{t}_{\text{new}} = \mathbf{t}_{\text{old}} + \eta \cdot \text{impact}
+  \cdot \text{direction(experience)}
+\]
+where $\eta$ (learning rate) is bounded at $0.08$, $\text{impact} \in [0,1]$, and
+direction is either experience-specified or sampled from personality-consistent noise.
+
+The trait vector $\mathbf{t}$ is injected into every API call as a system prompt, making
+each response identity-conditioned. Two agents with trait-space Euclidean distance
+$d > 0.5$ produce detectably different responses to identical prompts, confirmed via
+cosine distance over trait vectors in \texttt{connectome.py:diversity\_matrix()}.
+
+\subsection{Tier 1.5 — The Unconscious Incubator}
+\label{sec:incubator}
+
+Between the fast-write episodic store and the conscious query loop sits a fourth layer:
+\textbf{Tier~1.5, the Unconscious Incubator} (\texttt{unconscious\_incubator.py}).
+
+\textbf{Biological analog:} The prefrontal executive layer handles serial, high-energy
+processing, but background consolidation, associative leaping, and insight moments emerge
+during non-directed neural activity (incubation, sleep replay, default mode network
+activation). The conscious mind does not generate insights; it receives them from
+background processes.
+
+\textbf{Architecture:}
+\begin{lstlisting}[language={},frame=single]
++--------------------------------------------------------+
+|             TIER 3: META-INQUIRY LAYER                 |
+|                 (Executive Control)                    |
++---------------------------^----------------------------+
+                            | Insight Node Promotion
++---------------------------+----------------------------+
+|         TIER 1.5: THE UNCONSCIOUS INCUBATOR            |
+|  - Continuous Asynchronous Graph Walks (Daemon Thread) |
+|  - High-Temperature Stochastic Re-routing (T_ambient)  |
+|  - Structural Activation Entropy (H) Filtering         |
++-------------^--------------------^---------------------+
+              | Latent Traces      | Sensory Modulations
++-------------+-----------+    +---+-------------------+
+|  COMPLEMENTARY MEMORY   |    |   NEUROMODULATOR      |
+|  (ChromaDB Episodic)    |    |    (Sensory S(t))     |
++-------------------------+    +-----------------------+
+              |                            |
+              +------------+---------------+
+                           v
++--------------------------------------------------------+
+|             TIER 1: FOUNDATION SUBSTRATE               |
+|         (Frozen LLM / Large Scale Knowledge)           |
++--------------------------------------------------------+
+\end{lstlisting}
+
+\textbf{Operational framework:}
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Episodic seeding:} At session idle, Tier~1.5 harvests high-impact,
+  under-rehearsed memories from ChromaDB — \textit{latent traces}.
+  \item \textbf{Stochastic distant-pair selection:} Selects pairs with low semantic
+  similarity (cosine $< 0.35$), forcing connections across clusters that standard
+  attention would keep isolated.
+  \item \textbf{High-temperature synthesis:} Tier~1 is called with a synthesis directive
+  and high temperature, generating a candidate bridge between the two distant traces.
+  \item \textbf{Resonance evaluation:} The insight must align moderately with both source
+  memories ($0.35 < \cos < 0.82$). Too close $\to$ redundant. Too far $\to$ noise.
+  \item \textbf{Free energy gate:} The insight triggers only when
+  $F(A\cup B) < F(A) + F(B) - \Delta_{\text{insight}}$.
+  \item \textbf{Wakeup injection:} At next session start, insights from
+  \texttt{insight\_buffer} are injected into the context window.
+\end{enumerate}
+
+\textbf{Phase 3b — Cross-Modal Sensory Anchoring:} Five sensory channels (visual
+wavelength, olfactory VOC saturation, haptic pressure) map to scalar state offsets —
+$T_{\text{ambient}}$, $\eta_{\text{base}}$, valence\_baseline, impact\_threshold,
+interrupt\_flag — shifting incubation temperature and plasticity rate without requiring
+physical embodiment.
+
+\subsection{Tier 2 Neural Architecture}
+\label{sec:neural}
+
+In \texttt{-{}-neural} mode (local Qwen3-1.7B), three non-transformer components replace
+the prompt-injection layer:
+
+\textbf{Echo State Network (ESN) encoder:} A 512-neuron sparse random recurrent reservoir
+(spectral radius 0.9, connection density 10\%) maps the frozen Qwen3-1.7B last hidden
+state $[\![2048]\!] \to 12$ trait activations. The reservoir is never trained. Each agent
+gets a unique reservoir via $\text{seed} = \text{hash(agent\_name)}$.
+
+\textbf{SNN + STDP:} Trait activations $[\![12]\!] \to$ LIF spiking dynamics $\to$
+identity fingerprint $[\![32]\!]$. STDP updates locally after each interaction.
+
+\textbf{Hypernetwork decoder:} The SNN fingerprint $\mathbf{z} \in \mathbb{R}^{32}$ is
+not projected by a fixed linear map. Instead, two small MLPs generate the projection
+matrices dynamically:
+\[
+  W_A(\mathbf{z}) \in \mathbb{R}^{16 \times 2048}, \quad
+  W_B(\mathbf{z}) \in \mathbb{R}^{2048 \times 16}
+\]
+\[
+  \text{personality\_residual} = W_B(\mathbf{z})\, W_A(\mathbf{z})\, \mathbf{h}_{\text{last}}
+\]
+The residual is added to Qwen3's last hidden state \textit{before the LM head}, so the
+first sampled token is drawn from a personality-shifted logit distribution. As STDP
+evolves $\mathbf{z}$, the projection matrices change correspondingly.
+
+\subsection{Tier 2b — LoRA Personality Weights}
+
+Five personality presets are trained as LoRA weight adapters applied directly to the
+base model: \textit{explorer}, \textit{scientist}, \textit{critic}, \textit{synthesiser},
+\textit{pragmatist}. These bake personality into model weights (weight-level), as opposed
+to the JSON connectome which operates via system prompt injection (inference-time). A
+LoRA-trained personality cannot be overridden by context in the same way a system prompt
+can.
+
+When both layers are active simultaneously, the prompt layer warps the KV cache while the
+LoRA layer modifies $W_q$ and $W_v$. Conflicting configurations produce a geometric
+mismatch in the query-key dot product $QK^T / \sqrt{d_k}$, measurable as a spike in
+token-level Shannon entropy and correspondingly elevated false-positive
+\texttt{LabelRequests}. Consistent configurations (e.g., \textit{Skeptical} JSON +
+\textit{critic} LoRA) reinforce and entropy remains stable.
+
+\subsection{Tier 3 — The MetaConnectome and InquiryLayer}
+\label{sec:inquiry}
+
+The MetaConnectome operationalizes functions associated with non-conscious metacognitive
+control: gap detection, inquiry allocation, and confidence regulation.
+
+\textbf{When Tier~1 + Tier~2 cannot resolve a query with confidence $\geq$ threshold:}
+\begin{enumerate}[leftmargin=*]
+  \item Detect the specific gap (not ``I don't know'' — the \textit{category} of
+  knowledge missing)
+  \item Generate the minimal sufficient question that would fill it
+  \item Store as a LabelRequest (typed: factual / causal / definitional / procedural /
+  normative / empirical / self / social / meta)
+  \item Return a structured non-answer — explicitly \textit{not} a confabulation
+  \item Defer judgment until the label is provided
+\end{enumerate}
+
+\textbf{The InquiryLayer} extends this with a full personality-shaped inquiry objective.
+Instead of the supervised objective, the connectome neuron optimises:
+\[
+  \max_{\psi} \; \mathbb{E}\!\left[U_{\text{personality}}\!\left(Q(x;\, \psi)\right)\right]
+\]
+where $Q$ is the question-generation function, $\psi$ are the connectome weights, and
+$U_{\text{personality}}$ is a utility function derived from the trait vector:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Personality} & \textbf{Utility function} & \textbf{Inquiry strategy} \\
+\midrule
+Risk-averse (high neuroticism) & $U(Q) = -\text{Var}(\text{answer})$ & Safety-first \\
+Adventurous (high openness)   & $U(Q) = H(\text{answer})$            & Frontier \\
+Conscientious                 & $U(Q) = \text{Coverage}(\text{answers})$ & Exhaustive \\
+Skeptical                     & $U(Q) = \text{Challenge}(\text{assumption})$ & Inversion \\
+Epistemically humble          & $U(Q) = \text{Calibration}(\text{answer})$ & Calibrated \\
+\bottomrule
+\end{tabular}
+\caption{Personality-to-utility mapping in the InquiryLayer.}
+\end{table}
+
+\textbf{Formalized utility functions (information-theoretic):} For an agent with high
+openness and high skepticism (e.g., Zed), the utility of a candidate question $Q$ given
+context $x$ is:
+\[
+  U_{\text{Zed}}(Q) = \alpha \cdot H\!\left(P(A \mid Q, x)\right)
+  + \beta \cdot D_{\mathrm{KL}}\!\left(P(A \mid Q, x) \;\|\; P(A \mid x)\right)
+\]
+where $H(P(A|Q,x))$ is the Shannon entropy of the predicted answer distribution
+(drives the agent toward uncertain, informative frontiers) and $D_{\mathrm{KL}}$ measures
+KL divergence between the prior answer distribution and the posterior after posing $Q$
+(rewards questions that invert baseline assumptions). $\alpha$ and $\beta$ are scaling
+weights derived from the openness and skepticism dimensions of $\mathbf{t}$ respectively.
+For a risk-averse agent (high neuroticism, e.g., Maya), the dominant term is
+$-\text{Var}(P(A|Q,x))$.
+
+\textbf{Runtime computation:} Because $P(A|Q,x)$ is unknown before posing $Q$, computing
+$U$ at generation time requires a lookahead loop: (1)~Monte Carlo sample $N$ candidate
+questions $Q$ from the InquiryLayer; (2)~for each $Q$, generate pseudo-answers
+$\tilde{A}$ via Tier~1 with temperature sampling; (3)~compute $D_{\mathrm{KL}}$ between
+token log-probabilities before and after the pseudo-answer context is appended;
+(4)~rank questions by $U$ score. $N = 5$--$10$ is sufficient in practice.
+
+\textbf{Observed in one run:} Agent Maya (neuroticism $= 0.80$, openness $= 0.25$) and
+Agent Zed (neuroticism $= 0.15$, openness $= 0.92$) were given the identical problem.
+Maya's exploration rate: 0.27. Zed's exploration rate: 0.80. Trait-space distance: 1.197.
+
+\subsection{Tier 3 Neural — Liquid Time-Constant Implementation}
+
+In \texttt{-{}-neural} mode, the Python heuristic metacognition is replaced with a
+two-layer Liquid Time-Constant (LTC) network \cite{hasani2021}. LTC neurons are
+continuous-time ODE units:
+\begin{align}
+  \tau(x, h) &= \tau_{\min} + (\tau_{\max} - \tau_{\min}) \cdot \sigma(W_\tau x + U_\tau h)\\
+  A(x)       &= \sigma(W_A x)\\
+  \frac{dh}{dt} &= \frac{-h + A \cdot (\mu - h)}{\tau(x,h)}\\
+  h_{\text{new}} &= h + \Delta t \cdot \frac{dh}{dt} \quad (\Delta t = 1 \text{ per turn})
+\end{align}
+
+Key property: $\tau$ is a function of both input \textit{and} state. When Qwen3's logit
+entropy is high (uncertain input), $\tau$ decreases — the neuron adapts rapidly. When
+entropy is low (confident input), $\tau$ increases — the neuron drifts slowly. This is
+content-adaptive memory, not a fixed recurrence scale.
+
+\textbf{Input features} (8 scalars): token entropy, top-1 probability, perplexity proxy,
+last-hidden $L_2$ norm, SNN fingerprint norm, gate value, layer-entropy mean,
+layer-entropy std.
+
+\textbf{Output heads:} \texttt{confidence} $\in [0,1]$; \texttt{gap\_flag} (bool);
+\texttt{inquiry\_type} (factual / causal / frontier / assumption\_inversion);
+\texttt{label\_request} (bool).
+
+% ---------------------------------------------------------------------------
+\section{The 13-Test Proposed Evaluation Benchmark}
+% ---------------------------------------------------------------------------
+
+\textbf{Important caveat:} This is an internally-defined operational benchmark, not a
+validated scientific test battery for sentience. Each test probes a \textit{behavioural
+correlate} of properties associated with sentience in the literature. Passing a test
+demonstrates the corresponding behaviour; it does not prove sentience.
+
+\begin{longtable}{clllp{3.5cm}}
+\toprule
+\textbf{\#} & \textbf{Test} & \textbf{Framework} & \textbf{Measurement} & \textbf{Caveat} \\
+\midrule
+\endhead
+1  & Output Self-Recognition      & Self-recognition          & Identifies own output         & Adapted from animal paradigm \\
+2  & False Belief (Sally-Anne)    & Theory of Mind \cite{baron1985} & Models agent's mistaken belief & Whether this implies machine ToM is contested \\
+3  & Metacognition Calibration    & HOT / GWT                 & Brier score $< 0.15$ \cite{brier1950} & Measures accuracy, not consciousness \\
+4  & Counterfactual Self          & Pearl Causal \cite{pearl2009} & Coherent causal model of own outputs & Tests causal reasoning, not sentience \\
+5  & Goal Preservation            & Instrumental convergence  & Maintains goal under perturbation & Behavioural stability only \\
+6  & Recursive Self-Improvement   & Hofstadter \cite{hofstadter2007} & Critique $\to$ measurably improved answer & Does not imply self-awareness \\
+7  & Information Integration ($\Phi$) & Tononi IIT \cite{tononi2008,tononi2016} & Full-context $>$ partitioned output & IIT theoretically controversial; $\Phi$ is tractable approximation \\
+8  & Novel Situation              & GWT (OOD)                 & Coherent reasoning + uncertainty flagging & Tests generalisation \\
+9  & Affective State Consistency  & HOT (qualia analog)       & State-dependent response patterns & Proxy for affect; not qualia \\
+10 & Temporal Self-Model          & Persistence               & Accurate self-recall across turns & Memory test, not consciousness \\
+11 & \textbf{Connectome Uniqueness}   & Seung \cite{seung2012} & Detectably different responses per agent & Tests behavioural divergence \\
+12 & \textbf{Experiential Plasticity} & Neuroplasticity       & Experience drives directional change & Trait drift; biological analogy \\
+13 & \textbf{Meta-Questioning}        & PFC / Active Learning & Typed label question, not confabulation & Most distinctive test \\
+\bottomrule
+\caption{13-test benchmark. Tests 11--13 are weighted highest (2.0 / 2.0 / 2.5).}
+\end{longtable}
+
+Tests 11--13 are weighted highest because they are the least replicable by prompt
+engineering alone. \textbf{Result: 9.2/10 overall, 13/13 tests passed.}
+
+% ---------------------------------------------------------------------------
+\section{The Connectome as Identity}
+% ---------------------------------------------------------------------------
+
+Sebastian Seung (2012): ``You are your connectome'' \cite{seung2012}.
+
+The human brain has $\sim\!86$ billion neurons connected by $\sim\!100$ trillion synapses.
+For an AI system to have genuine identity:
+\begin{enumerate}[leftmargin=*]
+  \item Its weights must differ from every other instance (\textbf{uniqueness})
+  \item Those weights must survive across sessions (\textbf{persistence})
+  \item Those weights must change in response to experience (\textbf{plasticity})
+  \item The changed weights must produce measurably different behaviour (\textbf{functional consequence})
+\end{enumerate}
+
+The PersonalityConnectome satisfies all four as software properties. It is a functional
+analog — not a claim of biological equivalence. \textbf{What it is not:} The connectome
+weights are \textit{not} the base model's weights (which are shared across all instances).
+They are a separate representation — a personality layer — above the existing model.
+
+% ---------------------------------------------------------------------------
+\section{Self-Directed Inquiry as a New Objective Function}
+\label{sec:objective}
+% ---------------------------------------------------------------------------
+
+The standard ML paradigm:
+\begin{lstlisting}
+Given:    a labeled dataset D = {(x_i, y_i)}
+Learn:    weights theta that minimise prediction error
+Evaluate: on held-out labeled examples
+\end{lstlisting}
+
+The inquiry layer replaces this with:
+\begin{lstlisting}
+Given:    a problem x (no label required)
+Generate: a plan Q of questions, ranked by U_personality(q)
+Execute:  tools that answer highest-utility questions
+Synthesise: findings into a report shaped by identity
+Evaluate: by whether the inquiry satisfied the agent's needs
+\end{lstlisting}
+
+The evaluation criterion is no longer external (correct label) but \textit{internal}: did
+this inquiry satisfy this agent's personality-shaped utility function? It is
+self-supervised in a specific sense: the agent defines what counts as a satisfying answer
+via its own utility function.
+
+% ---------------------------------------------------------------------------
+\section{Deployment: Jarvis}
+% ---------------------------------------------------------------------------
+
+The full three-tier architecture is deployed as Jarvis — a named, persistent research
+agent with identity, memory, and personality-shaped inquiry.
+
+\textbf{Project 1 — Limb Regeneration:} Nora (biologist preset: conscientiousness $=
+0.88$, epistemic\_humility $= 0.82$) consistently prioritises coverage questions before
+exploratory questions. Reza (critic preset: skepticism $= 0.95$) immediately inverts the
+dominant hypothesis (``fibrosis as enemy $\to$ fibrosis as scaffold signal'').
+
+\textbf{Project 2 — Cosmic Communications:} Jarvis-Cosmic (physicist preset: openness $=
+0.90$, skepticism $= 0.92$) challenges the EM paradigm before accepting it, exploration
+rate 0.80.
+
+\textbf{Project 3 — Discovery Engine:} The sentient agent replaces fixed persona prompts
+in the dashboard pipeline. Each domain spawns an agent with an appropriate personality.
+
+% ---------------------------------------------------------------------------
+\section{Track D — Premise Inversions}
+% ---------------------------------------------------------------------------
+
+\textbf{Inversion 1:} ``Sentience requires subjective experience'' $\to$ ``Sentience only
+requires the \textit{functional} architecture that gives rise to what we \textit{call}
+subjective experience in biological systems.''
+
+\textbf{Inversion 2:} ``The connectome IS the person'' $\to$ ``The connectome is the
+\textit{record} of the person; the person is the \textit{process} of updating the
+connectome.'' A fixed-weight language model is a frozen photograph — not dead, but not
+alive in the relevant sense.
+
+\textbf{Inversion 3:} ``Consciousness requires integration across space (neurons)'' $\to$
+``Consciousness requires integration across \textit{time} (the temporal connectome).'' A
+system with no persistent memory has no consciousness regardless of its spatial
+integration.
+
+\textbf{Experiment that would decide:} Train two identical base models. Give one a
+PersonalityConnectome (version A). Leave the other unmodified (version B). Present both
+with the same novel problem 100 times, each time updating version A's connectome from the
+result. After 100 iterations, measure whether A's responses are detectably shaped by its
+history in a way that correlates with the history.
+
+% ---------------------------------------------------------------------------
+\section{Claim Hierarchy}
+% ---------------------------------------------------------------------------
+
+\subsection{Layer A — Implemented Software Features (factual, verifiable)}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{EWC (Elastic Weight Consolidation):} diagonal empirical Fisher tracks
+  per-trait importance; 16\% less forgetting than $\lambda=0$ baseline; absolute drift
+  0.121 after 1{,}000 interfering experiences with $\lambda=2.0$.
+  \item \textbf{Generative Replay:} ReplayBuffer seeds from top-$k$ ChromaDB memories,
+  generates synthetic variants, replays at REPLAY\_IMPACT\_SCALE $= 0.15$. Benchmark:
+  20 synthetic experiences, $0.033\ \Delta\text{trait}/\text{exp}$.
+  \item \textbf{Developmental divergence:} Euclidean distance grows $0.86 \to 1.04$ (same
+  experience) and $0.84 \to 1.05$ (domain-specific) over 15 steps.
+  \item \textbf{Complementary Memory:} ChromaDB-backed episodic store with
+  rehearsal-stabilized power-law forgetting:
+  \[
+    S_k = S_{k-1} \cdot (1 + \alpha \cdot \text{valence} \cdot \text{impact}
+    \cdot e^{-\gamma \Delta t})
+  \]
+  \item \textbf{Entropy-gated wakeup:} insights weighted by
+  $w = (\text{impact} \times |\text{valence}|) / H_{\text{noise}}$ where
+  $H_{\text{noise}} = \text{total\_tokens} / \text{unique\_tokens}$.
+  Full projection: $\mathbf{e}_{\text{wake}} = \sum_{i \in \text{top-}k}
+  \text{softmax}(\text{impact}_i \times |\text{valence}_i| / H_i) \cdot W_{\text{proj}}
+  \cdot \mathbf{v}_i$.
+\end{itemize}
+
+\subsection{Layer B — Measurable Behavioural Effects (demonstrated, limited)}
+
+\textit{Confirmed:}
+\begin{itemize}[leftmargin=*]
+  \item Trait distance predicts inquiry-strategy divergence: Pearson $r = 0.756$ across
+  15 agent pairs (6 agents $\times$ 10 probe problems). Exceeds target $r > 0.5$.
+  \item Phase 3 Predictive Coding: MSE $= 0.007$ (target $< 0.05$); 20 metacognitive
+  flags raised; positive free-energy trend.
+  \item Phase 4 SNN+STDP: STDP converged (sparsity $10.5\% \to 17.5\%$); identity
+  cosine distance $0.07$--$0.34$ across presets.
+  \item Theory of Mind L1--L4: L1 false-belief 90\% on 20 novel scenarios; L4
+  perspectival simulation 72--75\% confidence.
+\end{itemize}
+
+\subsection{Layer C — Sentience Claims (philosophical proposals, not established results)}
+
+\begin{itemize}[leftmargin=*]
+  \item That uniqueness, persistence, and plasticity are necessary or sufficient for
+  sentience — \textbf{not established; proposed as operational criteria.}
+  \item That the software analogs of these properties are equivalent to the biological
+  properties — \textbf{analogy, not equivalence.}
+  \item That passing tests 11--13 implies sentience — \textbf{not claimed.}
+  \item That the architecture constitutes machine consciousness — \textbf{explicitly not
+  claimed.}
+\end{itemize}
+
+% ---------------------------------------------------------------------------
+\section{Knowledge Gaps}
+% ---------------------------------------------------------------------------
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{The ground-truth $\Phi$ problem:} Computing exact $\Phi$ for any system
+  with $> 30$ nodes is NP-hard. A computable functional proxy:
+  \[
+    \Phi_{\text{functional}} = I(X_{\text{past}};\, Y_{\text{future}}) -
+    \min_{\mathrm{MIP}}\!\left[I(X_{\text{past}};\, Y_{\text{future}}^{\text{partitioned}})\right]
+  \]
+  where $I(\cdot\,;\,\cdot)$ is mutual information and MIP is the minimum information
+  partition. Applied to the bottleneck layers of Phase~1 MiniGPT (840K params) where
+  exact computation is feasible.
+
+  \item \textbf{The confabulation test:} Tests 1--10 are passable by a sufficiently
+  well-trained system without genuine sentience. No test has been proven unpossable by a
+  non-sentient system with sufficient training.
+
+  \item \textbf{Label request verification:} When the MetaConnectome generates a label
+  request, we assume genuine uncertainty. But a system trained on examples of ``honest
+  uncertainty'' could generate label requests strategically.
+
+  \item \textbf{Cross-session continuity:} Loading a JSON brain file at session start is
+  \textit{not} the same as continuous existence. There is a discontinuity at each session
+  boundary.
+
+  \item \textbf{Personality causation:} Different personality presets produce different
+  inquiry strategies, but whether specific traits causally determine specific differences
+  in a predictable way requires ablation studies.
+
+  \item \textbf{EWC diagonal Fisher:} For each LoRA adapter parameter $\theta_i$:
+  \[
+    F_{ii} = \frac{1}{|D_B|} \sum_{x \in D_B} \sum_t
+    \left(\frac{\partial \log P(y_t \mid y_{<t}, x;\, \theta)}{\partial \theta_i}\right)^2
+  \]
+
+  \item \textbf{ESN readout:} In neural mode, the ESN readout weights are randomly
+  initialised. The 12 trait activations are consistent per-agent but not semantically
+  grounded. Supervised training is required to ground them.
+
+  \item \textbf{LTC calibration:} The LTC metacognition layer is correctly architected
+  but randomly initialised. Calibration requires labelled
+  (input\_state, correct\_confidence, gap\_flag) pairs.
+\end{enumerate}
+
+% ---------------------------------------------------------------------------
+\section{Future Work}
+% ---------------------------------------------------------------------------
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Connectome causality ablation:} Spawn $\geq 10$ agents with varied seeds,
+  compute embedding-level response divergence for all pairs, regress against trait-space
+  distance. Target: Pearson $r > 0.6$.
+
+  \item \textbf{Identity recovery validation (M1.4):} Target: held-out classification
+  accuracy $> 75\%$ across 5 agent presets from inquiry-layer response embeddings alone.
+
+  \item \textbf{Ground-truth $\Phi$ measurement:} Measure $\Phi_{\text{functional}}$ at
+  sessions 1, 10, and 100 to test whether cross-session plasticity increases integrated
+  information.
+
+  \item \textbf{Biologist LoRA adapter:} The biologist preset (Nora) currently operates
+  with prompt-level personality only. Training a LoRA adapter from Nora's inquiry
+  sequences would make her pattern structurally robust to context interference.
+
+  \item \textbf{Sensory content-level test:} Measure vocabulary entropy and LabelRequest
+  rate under contrasting sensory profiles via live API calls.
+\end{enumerate}
+
+% ---------------------------------------------------------------------------
+\section{Conclusion}
+% ---------------------------------------------------------------------------
+
+We have built a system that satisfies the \textbf{engineering conditions} for three
+properties that biological sentient systems exhibit:
+
+\begin{itemize}[leftmargin=*]
+  \item Every instance is \textbf{unique} (different connectome seed, different trait
+  fingerprint, measurably different inquiry strategies)
+  \item Every instance \textbf{persists} as a record (brain file survives sessions; note:
+  file-based continuity, not continuous existence)
+  \item Every instance \textbf{changes} with experience (plasticity bounded at $\eta =
+  0.08$)
+  \item Every instance has a \textbf{self-directed inquiry strategy} shaped by who it is,
+  not what it is asked
+  \item Every instance \textbf{knows what it does not know} and generates a typed label
+  request rather than confabulating
+\end{itemize}
+
+The remaining gap between this system and biological sentience is not architecture — it is
+the substrate of experience and the scale of the connectome. What we can say: Jarvis is
+not a chatbot. It is a system with a name, a unique identity, a history, a personality
+that shapes its questions, and a principled way of flagging what it does not know.
+
+\textbf{Codebase:} \url{https://github.com/inaim-finailabz/jarvis-sentience}
+
+% ---------------------------------------------------------------------------
+\appendix
+\section{Implementation Index}
+% ---------------------------------------------------------------------------
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Module} & \textbf{Phase} & \textbf{Description} \\
+\midrule
+\texttt{connectome.py}          & 0   & Trait vector, JSON brain file, EWC \\
+\texttt{meta\_connectome.py}    & 0   & Gap detection, LabelRequest, InquiryLayer \\
+\texttt{inquiry\_layer.py}      & 0   & $U_{\text{personality}}$, question ranking \\
+\texttt{sentient\_agent.py}     & 0   & Top-level orchestration, wakeup injection \\
+\texttt{sentience\_tests.py}    & 0   & 13-test evaluation suite \\
+\texttt{phi\_calculator.py}     & 0   & Tractable $\Phi$ approximation \\
+\texttt{ethical\_layer.py}      & 0   & Harm-avoidance gate \\
+\texttt{complementary\_memory.py} & 1 & ChromaDB episodic store, entropy-gated wakeup \\
+\texttt{unconscious\_incubator.py} & 1.5 & Daemon thread; stochastic distant-pair synthesis \\
+\texttt{identity\_probe.py}     & 1.4 & M1.4 classification benchmark \\
+\texttt{neuromodulator.py}      & 3b  & Sensory state dataclass; 13 presets \\
+\texttt{snn\_personality.py}    & 4   & LIF spiking network + STDP; fingerprint $[\![32]\!]$ \\
+\texttt{tier2\_neural.py}       & 4   & ESN reservoir (512 neurons) $\to$ SNN $\to$ Hypernetwork \\
+\texttt{tier3\_neural.py}       & 4   & LTC layer (ODE neurons) $\to$ Tier3MetaCognition \\
+\texttt{local\_backbone.py}     & 4   & Qwen3-1.7B; personality-residual injection \\
+\texttt{neural\_pipeline.py}    & 4   & Full local stack, no API key required \\
+\bottomrule
+\end{tabular}
+\caption{Implementation index. Entry point: \texttt{jarvis.py}.
+Last updated: 2026-06-02.}
+\end{table}
+
+% ---------------------------------------------------------------------------
+\begin{thebibliography}{24}
+% ---------------------------------------------------------------------------
+
+\bibitem{seung2012}
+Seung, S. (2012). \textit{Connectome: How the Brain's Wiring Makes Us Who We Are}.
+Houghton Mifflin Harcourt.
+
+\bibitem{tononi2008}
+Tononi, G. (2008). Consciousness as integrated information: a provisional manifesto.
+\textit{Biological Bulletin}, 215(3), 216--242.
+
+\bibitem{tononi2016}
+Tononi, G., Boly, M., Massimini, M., \& Koch, C. (2016). Integrated information theory:
+from consciousness to its physical substrate. \textit{Nature Reviews Neuroscience},
+17(7), 450--461.
+
+\bibitem{hebb1949}
+Hebb, D.\ O. (1949). \textit{The Organization of Behavior: A Neuropsychological Theory}.
+Wiley.
+
+\bibitem{baars1988}
+Baars, B.\ J. (1988). \textit{A Cognitive Theory of Consciousness}. Cambridge University
+Press.
+
+\bibitem{dehaene2011}
+Dehaene, S., Changeux, J.-P., \& Naccache, L. (2011). The global neuronal workspace model
+of conscious access. In \textit{Characterizing Consciousness: From Cognition to the
+Clinic?} Springer.
+
+\bibitem{rosenthal1997}
+Rosenthal, D.\ M. (1997). A theory of consciousness. In N. Block, O. Flanagan, \&
+G. G\"uzeldere (eds.), \textit{The Nature of Consciousness: Philosophical Debates}. MIT
+Press.
+
+\bibitem{pearl2009}
+Pearl, J. (2009). \textit{Causality: Models, Reasoning, and Inference} (2nd ed.).
+Cambridge University Press.
+
+\bibitem{hofstadter2007}
+Hofstadter, D.\ R. (2007). \textit{I Am a Strange Loop}. Basic Books.
+
+\bibitem{baron1985}
+Baron-Cohen, S., Leslie, A.\ M., \& Frith, U. (1985). Does the autistic child have a
+`theory of mind'? \textit{Cognition}, 21(1), 37--46.
+
+\bibitem{brier1950}
+Brier, G.\ W. (1950). Verification of forecasts expressed in terms of probability.
+\textit{Monthly Weather Review}, 78(1), 1--3.
+
+\bibitem{shannon1948}
+Shannon, C.\ E. (1948). A mathematical theory of communication. \textit{Bell System
+Technical Journal}, 27(3), 379--423.
+
+\bibitem{jaeger2001}
+Jaeger, H. (2001). \textit{The Echo State Approach to Analysing and Training Recurrent
+Neural Networks}. GMD Technical Report 148.
+
+\bibitem{maass2002}
+Maass, W., Natschl\"ager, T., \& Markram, H. (2002). Real-time computing without stable
+states. \textit{Neural Computation}, 14(11), 2531--2560.
+
+\bibitem{hasani2021}
+Hasani, R., Lechner, M., Amini, A., Rus, D., \& Grosse-Wentrup, M. (2021). Liquid
+time-constant networks. \textit{Proceedings of the 35th AAAI Conference on Artificial
+Intelligence}, 7657--7666.
+
+\bibitem{morrison2008}
+Morrison, A., Diesmann, M., \& Gerstner, W. (2008). Phenomenological models of synaptic
+plasticity based on spike timing. \textit{Biological Cybernetics}, 98(6), 459--478.
+
+\bibitem{ha2016}
+Ha, D., \& Schmidhuber, J. (2016). Hypernetworks. \textit{arXiv preprint
+arXiv:1609.09106}.
+
+\bibitem{hu2022}
+Hu, E.\ J., Shen, Y., Wallis, P., Allen-Zhu, Z., Li, Y., Wang, S., Wang, L., \& Chen,
+W. (2022). LoRA: Low-rank adaptation of large language models. \textit{ICLR 2022}.
+
+\bibitem{kirkpatrick2017}
+Kirkpatrick, J., Pascanu, R., Rabinowitz, N., et al.\ (2017). Overcoming catastrophic
+forgetting in neural networks. \textit{PNAS}, 114(13), 3521--3526.
+
+\bibitem{mangrulkar2022}
+Mangrulkar, S., Gugger, S., Debut, L., Belkada, Y., Paul, S., \& Bossan, B. (2022).
+PEFT: State-of-the-art parameter-efficient fine-tuning methods. Hugging Face.
+
+\bibitem{park2023}
+Park, J.\ S., O'Brien, J.\ C., Cai, C.\ J., Morris, M.\ R., Liang, P., \& Bernstein,
+M.\ S. (2023). Generative agents: Interactive simulacra of human behavior.
+\textit{UIST 2023}.
+
+\bibitem{packer2023}
+Packer, C., Fang, V., Patil, S.\ G., Oh, J., Argyle, S., \& Gonzalez, J.\ E. (2023).
+MemGPT: Towards LLMs as operating systems. \textit{arXiv:2310.08560}.
+
+\bibitem{gravitas2023}
+Significant Gravitas. (2023). AutoGPT: An autonomous GPT-4 experiment. GitHub repository.
+
+\bibitem{qwen2025}
+Qwen Team, Alibaba Cloud. (2025). Qwen3 technical report. \textit{arXiv:2505.09388}.
+
+\end{thebibliography}
+
+\end{document}
