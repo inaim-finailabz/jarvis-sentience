@@ -234,13 +234,13 @@ Tests 11–13 weighted highest (2.0/2.0/2.5) — least replicable by prompt engi
 ## Get Involved
 
 **Read the full paper:**
-`WHITEPAPER_SENTIENT_MODEL.md` — Finailabaz Research / NewAIConcept
+`WHITEPAPER_SENTIENT_MODEL.md` — Finailabz Research / NewAIConcept
 
 **Explore the code:**
 `phase7_sentience/` — Python 3.14 · Claude API · Qwen3-1.7B local (`--neural`)
 
 **Contact:**
-Issam Naim · Finailabaz Research
+Issam Naim · Finailabz Research
 i.naim@finailabz.com
 
 ---
@@ -253,7 +253,7 @@ i.naim@finailabz.com
 
 ### LinkedIn (long-form)
 
-We just published a technical white paper on machine sentience from Finailabaz Research.
+We just published a technical white paper on machine sentience from Finailabz Research.
 
 **The core idea:** Current LLMs have three engineering deficits — no persistent identity, no cross-session memory of self, and frozen weights that can't change with experience. We built a three-tier architecture that addresses each one.
 
