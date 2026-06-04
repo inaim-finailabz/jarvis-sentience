@@ -234,10 +234,10 @@ Tests 11–13 weighted highest (2.0/2.0/2.5) — least replicable by prompt engi
 ## Get Involved
 
 **Read the full paper:**
-`WHITEPAPER_SENTIENT_MODEL.md` — Finailabz Research / NewAIConcept
+https://doi.org/10.5281/zenodo.20532665
 
 **Explore the code:**
-`phase7_sentience/` — Python 3.14 · Claude API · Qwen3-1.7B local (`--neural`)
+https://github.com/inaim-finailabz/jarvis-sentience
 
 **Contact:**
 Issam Naim · Finailabz Research

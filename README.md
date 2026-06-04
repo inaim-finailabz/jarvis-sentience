@@ -95,6 +95,9 @@ phase7_sentience/
 
 [WHITEPAPER_SENTIENT_MODEL.md](WHITEPAPER_SENTIENT_MODEL.md)
 
+**Cite as:**
+> Naim, I. (2026). A Three-Tier Architecture for Machine Sentience: The Connectome Hypothesis. Zenodo. https://doi.org/10.5281/zenodo.20532665
+
 ---
 
 ## Contact
